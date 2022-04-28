@@ -1,0 +1,34 @@
+<div class = "container">
+  <div class = "row">
+    <div class = "col-3">
+      <div class = "col-6">
+
+      <div class = "card">
+        <div class = "card-header">
+        <h1 class = "text-center">Sign Up</h1>
+        </div>
+        <div class = "card-body">
+          <%= form_for @user do |f|%>
+          <div class = "row form-group">
+            <div class = "col">
+            <label>Enter Email:</label>
+           <%= f.text_field :username, class: "form-control", placeholder: "Email"%><br>
+          </div>
+          </div>
+          <div class = "row form-group">
+            <div class = "col">
+            <label>Enter Password:</label>    
+           <%= f.password_field :password, class: "form-control", placeholder: "Password"%><br>
+          </div>
+          </div>
+          <div class = "row form-group">
+            <div class = "col">
+          <%= f.submit class: "btn btn-success btn-block", value: "Create Account", name: "Create Account"%><%end%>
+          </div>
+        </div>
+      </div>
+  </div>
+  </div>
+</div>
+</div>
+</div>

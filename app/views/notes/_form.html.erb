@@ -1,0 +1,19 @@
+<%= form_for [@user, @user.notes.build] do  |f|%>
+<div class = "row form-group">
+  <div class = "col">
+  <%= f.text_field :title, :required => true, placeholder: "Enter Title", class: "form-control"%><br>
+  </div>
+</div>
+
+<div class = "row form-group">
+  <div class = "col">
+    <%= f.text_area :body, :required => true, placeholder: "Enter Text", class: "form-control"%><br>
+  </div>
+</div>
+
+<div class = "row form-group">
+<div class = "col text-center">
+ <%= f.submit class: "form-control btn btn-primary"%>
+</div>
+</div>
+<%end%>

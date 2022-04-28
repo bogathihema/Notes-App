@@ -1,0 +1,9 @@
+$('#share-note-modal').html('<%= escape_javascript(render partial: 'share_note', locals: {note: @note}) %>')
+$('#share-note-info-modal').show();
+$("#share-note-info-modal").click(function(ev) {
+    if(ev.target != this) return;
+    $('#share-note-info-modal').hide();
+  });
+$('button[data-dismiss="modal"]').click(function(){
+     $('#share-note-info-modal').hide();
+ })

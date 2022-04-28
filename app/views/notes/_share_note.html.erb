@@ -1,0 +1,50 @@
+<div class="modal position-relative" id="share-note-info-modal">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header text-light">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h3 class="modal-title">
+          Share note: <%= @note.title %>
+        </h3>
+      </div>
+      <div class="modal-body">
+        <div class = "row text-center pl-3">
+          <div class = "col-sm-3"></div>
+          <div class = "col-sm">
+            <%= form_with url: user_note_save_sharing_path(@user.id,@note.id), method: :post do  |f|%>
+              <div class = "row form-group">
+                <div class="row mr-3">
+                  <div class="col-sm-6">
+                    <textarea id= "user_emails" name="user_emails" placeholder: "Enter Emails with comma separated.." class="form-control"/>
+                  </div>
+                </div>
+                </div>
+                <div class = "row form-group">
+                  <div class = "col-sm-4"></div>
+                  <div class = "col-sm-4 text-center">
+                    <select id= "permission" name="permission" class="form-control">
+                      <option value = ""> Select Permission</option>
+                      <option value = "read"> Read</option>
+                      <option value = "update"> Update</option>
+                      <option value = "owner"> Owner</option>
+
+                    </select>
+                    </div>
+
+                  </div>
+                  <div class = "row form-group">
+                  <div class = "col-sm-6 text-right">
+                   <%= f.submit class: "btn btn-primary", value: "Share"%>
+                   </div>
+                   <div class = "col-sm-4 text-left">
+                   <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                  </div>
+                  </div>
+                <%end%>
+          </div>
+          </div>
+      </div>
+
+      </div>
+    </div>
+  </div>

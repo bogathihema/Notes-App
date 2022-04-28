@@ -1,0 +1,98 @@
+<div class = "container">
+  <div class = "row">
+  <h3 class>Note Details:</h3>
+  <table class="table table-hover table-responsive" id="notes-table">
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Body</th>
+        <th class = "text-center">Tags Count</th>
+        <th class = "text-center"> Edit Permissions</th>
+        <th class = "text-center"> Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @notes.each do |note| %>
+        <tr>
+          <td><%=note.title%></td>
+          <td class="multiline-ellipsis"><%=note.body%></td>
+          <td class = "text-center"><%= note.tags.count %></td>
+          <td class = "text-center">
+            <%= link_to '<i class="fa fa-lock text-danger pr-3" style= "font-size: 22px;"></i>'.html_safe, user_note_edit_permissions_path(@user.id, note.id), title: 'Edit Note Permissions for the Users', class: "text-danger"%>
+
+          </td>
+          <td class = "text-center">
+            <div class = "row">
+
+              <% if @owner_notes.include?(note.id)%>
+                <%= link_to '<i class="fa fa-info text-primary pr-3" style= "font-size: 22px;"></i>'.html_safe, user_note_path(@user.id,note), title: 'Note Details', class: "text-danger" %>
+                <%= link_to '<i class="fa fa-edit text-primary pr-3" style= "font-size: 22px;"></i>'.html_safe, edit_user_note_path(@user.id,note), title: 'Edit Note', class: "text-danger" %>
+                <%= link_to '<i class="fa fa-comments text-primary pr-3" style= "font-size: 22px;"></i>'.html_safe, add_tag_user_note_tags_path(@user.id, note), title: 'Add Tag', class: "text-danger", remote: true, 'data-toggle': 'modal', 'data-target': "#add-tag-modal" %>
+                <%= link_to '<i class="fa fa-users text-primary pr-3" style= "font-size: 22px;"></i>'.html_safe, share_note_user_notes_path(@user.id, note_id: note.id), title: 'Share Note', class: "text-danger", remote: true, 'data-toggle': 'modal', 'data-target': "#share-note-modal" %>
+                <%= link_to '<i class="fa fa-trash text-danger pr-3" style= "font-size: 22px;"></i>'.html_safe, user_note_path(@user.id, note), method: :delete, data: {confirm: "Are you sure, you want to delete '#{note.title.titleize}' this note?"}, title: 'Delete Note', class: "text-danger" %>
+
+              <% elsif @read_notes.include?(note.id)%>
+                <%= link_to '<i class="fa fa-info text-primary pr-3" style= "font-size: 22px;"></i>'.html_safe, user_note_path(@user.id,note), title: 'Note Details', class: "text-danger" %>
+                <%= link_to '<i class="fa fa-comments text-primary pr-3" style= "font-size: 22px;"></i>'.html_safe, add_tag_user_note_tags_path(@user.id, note), title: 'Add Tag', class: "text-danger", remote: true, 'data-toggle': 'modal', 'data-target': "#add-tag-modal" %>
+
+              <% elsif @update_notes.include?(note.id)%>
+                <%= link_to '<i class="fa fa-info text-primary pr-3" style= "font-size: 22px;"></i>'.html_safe, user_note_path(@user.id,note), title: 'Note Details', class: "text-danger" %>
+                <%= link_to '<i class="fa fa-edit text-primary pr-3" style= "font-size: 22px;"></i>'.html_safe, edit_user_note_path(@user.id,note), title: 'Edit Note', class: "text-danger" %>
+                <%= link_to '<i class="fa fa-comments text-primary pr-3" style= "font-size: 22px;"></i>'.html_safe, add_tag_user_note_tags_path(@user.id, note), title: 'Add Tag', class: "text-danger", remote: true, 'data-toggle': 'modal', 'data-target': "#add-tag-modal" %>
+              <% else %>
+                <%= link_to '<i class="fa fa-info text-primary pr-3" style= "font-size: 22px;"></i>'.html_safe, user_note_path(@user.id,note), title: 'Note Details', class: "text-danger" %>
+                <%= link_to '<i class="fa fa-edit text-primary pr-3" style= "font-size: 22px;"></i>'.html_safe, edit_user_note_path(@user.id,note), title: 'Edit Note', class: "text-danger" %>
+                <%= link_to '<i class="fa fa-comments text-primary pr-3" style= "font-size: 22px;"></i>'.html_safe, add_tag_user_note_tags_path(@user.id, note), title: 'Add Tag', class: "text-danger", remote: true, 'data-toggle': 'modal', 'data-target': "#add-tag-modal" %>
+                <%= link_to '<i class="fa fa-users text-primary pr-3" style= "font-size: 22px;"></i>'.html_safe, share_note_user_notes_path(@user.id, note_id: note.id), title: 'Share Note', class: "text-danger", remote: true, 'data-toggle': 'modal', 'data-target': "#share-note-modal" %>
+                <%= link_to '<i class="fa fa-trash text-danger pr-3" style= "font-size: 22px;"></i>'.html_safe, user_note_path(@user.id, note), method: :delete, data: {confirm: "Are you sure, you want to delete '#{note.title.titleize}' this note?"}, title: 'Delete Note', class: "text-danger" %>
+
+              <% end %>
+            </div>
+
+          </td>
+
+        </tr>
+      <% end %>
+
+<div class="row">
+  <div id = "add-tag-modal"></div>
+  </div>
+  <div class="row">
+    <div id = "share-note-modal"></div>
+    </div>
+
+    </tbody>
+  </table>
+  </div>
+
+  <br>
+  <br>
+  <div class = "row">
+      <div class = "col-sm text-left">
+        <a href= "<%= new_user_note_path(@user.id) %>", class = "btn btn-success btn-block rounded-0">Add note</a>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    .multiline-ellipsis {
+      max-width: 300px;
+      overflow: hidden;
+      -webkit-line-clamp: 4;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      line-height: 1.9rem;
+      padding-bottom: 0rem !important;
+    }
+
+    td.multiline-ellipsis {
+      padding-bottom: 10px !important;
+      text-align: left;
+    }
+    </style>
+
+  <script>
+    $('#notes-table').DataTable({
+
+    });
+    </script>

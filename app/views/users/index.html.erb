@@ -1,0 +1,30 @@
+<div class = "container">
+  <div class = "row">
+  <h2>User Details</h2>
+  <table class="table" id="users-table">
+    <thead>
+      <tr>
+        <th>Username</th>
+        <th>User notes</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @users.each do |user| %>
+        <tr>
+          <td><%=user.username%></td>
+          <td><%=user.notes.count%></td>
+        </tr>
+      <% end %>
+
+    </tbody>
+  </table>
+  </div>
+
+
+
+
+  <script>
+    $('#users-table').DataTable({
+
+    });
+    </script>

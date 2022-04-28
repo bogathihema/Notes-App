@@ -1,0 +1,19 @@
+<nav class="navbar navbar-default" style="background-color:#a8a88e">
+  <div class="container-fluid">
+    <div class="navbar-header pl-3">
+      <ul class="nav navbar-nav">
+        <% if current_user.present? %>
+          <ul style="background-color:#aa3434" class="nav navbar-nav pt-3">
+            <li><a href="<%=user_notes_path(current_user.id)%>">Notes Dashboard</a></li>
+          </ul>
+          <ul style="background-color:black" class="nav navbar-nav">
+            <li><a href="<%=logout_path%>">Logout</a></li>
+          </ul>
+        <% end %>
+      </ul>
+
+
+    </div>
+
+  </div>
+</nav>

@@ -1,0 +1,35 @@
+<div class="modal position-relative" id="add-tag-info-modal">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header text-light">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h3 class="modal-title">
+          Add tag for note: <%= @note.title %>
+        </h3>
+      </div>
+      <div class="modal-body">
+        <div class = "row text-center">
+          <%= form_with model: [@user, @note, @tag], url: user_note_tags_path(user_id: @user.id, id: @note.id), method: :post do  |f|%>
+          <div class = "row pl-3 form-group">
+            <div class = "col-sm-3 text-center"></div>
+            <div class = "col-sm-7 text-center">
+            <%= f.text_area :tag, :required => true, placeholder: "Enter Title", class: "form-control pl-3"%><br>
+            </div>
+          </div>
+
+          <div class = "row form-group">
+          <div class = "col-sm-6 text-right">
+           <%= f.submit class: "btn btn-primary"%>
+           </div>
+           <div class = "col-sm-4 text-left">
+           <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+          </div>
+          <%end%>
+          </div>
+          </div>
+
+      </div>
+    </div>
+  </div>
+</div>

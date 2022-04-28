@@ -1,0 +1,9 @@
+$('#add-tag-modal').html('<%= escape_javascript(render partial: 'add_tag', locals: {note: @note}) %>')
+$('#add-tag-info-modal').show();
+$("#add-tag-info-modal").click(function(ev) {
+    if(ev.target != this) return;
+    $('#add-tag-info-modal').hide();
+  });
+$('button[data-dismiss="modal"]').click(function(){
+     $('#add-tag-info-modal').hide();
+ })

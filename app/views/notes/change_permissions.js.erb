@@ -1,0 +1,9 @@
+$('#change-permissions-modal').html('<%= escape_javascript(render partial: 'change_permissions') %>')
+$('#change-permissions-info-modal').show();
+$("#change-permissions-info-modal").click(function(ev) {
+    if(ev.target != this) return;
+    $('#change-permissions-info-modal').hide();
+  });
+$('button[data-dismiss="modal"]').click(function(){
+     $('#change-permissions-info-modal').hide();
+ })

@@ -1,0 +1,46 @@
+<div class="modal position-relative" id="change-permissions-info-modal">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header text-light">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title text-danger">
+          Change permissions for the user <%=@note_user.username %> to the note: <%= @note.title %>
+        </h4>
+      </div>
+      <div class="modal-body">
+        <%= form_with url: user_note_update_permissions_path(user: @note_user.id,note_id: @note.id), method: :post do  |f|%>
+        <div class = "alert alert-info"><strong>This user has the "<%=@permission.upcase %>" permission for this note.</strong> </div>
+            <input type = "hidden" name = "note_permission" value= '<%=@permission%>' %>
+            <div class = "row form-group">
+              <div class = "col-sm-4"></div>
+              <div class = "col-sm-4 text-center">
+                <select id= "new_permission" name="new_permission" class="form-control">
+                  <option value = ""> Select Permission</option>
+                  <option value = "read"> Read</option>
+                  <option value = "update"> Update</option>
+                  <option value = "owner"> Owner</option>
+
+                </select>
+                </div>
+
+              </div>
+              <div class = "row form-group">
+              <div class = "col-sm-6 text-right">
+               <%= f.submit class: "btn btn-primary", value: "Share"%>
+               </div>
+               <div class = "col-sm-4 text-left">
+               <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+              </div>
+              </div>
+            <%end%>
+          </div>
+          </div>
+      </div>
+
+      </div>
+<script>
+$(document).ready(function(){
+  $("#new_permission").val('<%=@permission%>')
+})
+
+</script>
