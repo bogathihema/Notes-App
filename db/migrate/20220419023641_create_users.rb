@@ -5,9 +5,6 @@ class CreateUsers < ActiveRecord::Migration[6.0]
       t.string :password_digest
       t.string :permissions
       t.string :role
-      t.text :shared_notes
-      t.text :shared_users
-      t.text :notes_permissions
       t.timestamps
     end
   end

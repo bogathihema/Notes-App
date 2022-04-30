@@ -15,7 +15,6 @@ ActiveRecord::Schema.define(version: 2022_04_30_020030) do
   create_table "notes", force: :cascade do |t|
     t.string "title"
     t.text "body"
-    t.text "shared_users"
     t.integer "user_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
@@ -47,9 +46,6 @@ ActiveRecord::Schema.define(version: 2022_04_30_020030) do
     t.string "password_digest"
     t.string "permissions"
     t.string "role"
-    t.text "shared_notes"
-    t.text "shared_users"
-    t.text "notes_permissions"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
