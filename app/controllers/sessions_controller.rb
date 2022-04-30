@@ -17,6 +17,14 @@ class SessionsController < ApplicationController
   end
 
   def create
+    if !params[:password].present?
+      flash[:notice] = "Please enter email"
+      redirect_to "/welcome" and return
+    elsif !params[:username].present?
+      flash[:notice] = "Please enter password!"
+      redirect_to "/welcome" and return
+    end
+
     @user = User.find_by(username: params[:username])
     if @user
       session[:user_id] = @user.id
