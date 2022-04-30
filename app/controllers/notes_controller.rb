@@ -3,18 +3,10 @@ class NotesController < ApplicationController
   before_action :get_user
 
   def index
-    all_notes, @read_notes, @update_notes, @owner_notes = [], [], [], []
-    if @user.notes_permissions.present?
-      shared_notes = JSON.parse @user.notes_permissions
-      @read_notes = shared_notes["read"] if shared_notes["read"].present?
-      @update_notes = shared_notes["update"] if shared_notes["update"].present?
-      @owner_notes = shared_notes["owner"] if shared_notes["owner"].present?
-      shared_notes = @read_notes + @update_notes + @owner_notes
-      all_notes = shared_notes + @user.notes.pluck(:id)
-      @notes = Note.find(all_notes.uniq)
-    else
-      @notes = @user.notes
-    end
+    @user_notes = @user.notes
+    shared_notes = SharedNote.where(shared_user_id: @user.id)
+    @notes_ids = shared_notes.pluck(:note_id)
+    @user_shared_notes = Note.all.find(@notes_ids)
   end
 
   def new
@@ -44,18 +36,9 @@ class NotesController < ApplicationController
   end
 
   def edit_permissions
-    @shared_permissions = {}
+    # @shared_permissions = {}
     @note = Note.find(params[:note_id])
-    if @note.shared_users
-      note_users = JSON.parse @note.shared_users
-      @shared_users = User.find(note_users)
-      @shared_users.each do |user|
-        permissions = JSON.parse user.notes_permissions
-        @shared_permissions[user.id] = "read" if permissions["read"].present? && permissions["read"].include?(@note.id)
-        @shared_permissions[user.id] = "update" if permissions["update"].present? && permissions["update"].include?(@note.id)
-        @shared_permissions[user.id] = "owner" if permissions["owner"].present? && permissions["owner"].include?(@note.id)
-      end
-    end
+    @shared_notes = @note.shared_notes
   end
 
   def change_permissions
@@ -70,16 +53,23 @@ class NotesController < ApplicationController
   def update_permissions
     @note = Note.find(params[:note_id])
     @note_user = User.find(params[:user])
-    note_permissions = JSON.parse @note_user.notes_permissions
-    assigned_notes = note_permissions[params[:note_permission]]
-    assigned_notes.delete(@note.id)
-    note_permissions[params[:note_permission]] = assigned_notes
-    if note_permissions[params[:new_permission]].present?
-      note_permissions[params[:new_permission]] =   note_permissions[params[:new_permission]].push @note.id
+    @note.shared_notes.where(permissions: params["note_permission"], shared_user_id: @note_user.id, user_id: @user.id).first.update(permissions: params[:new_permission])
+    if params[:note_permission] == "owner"
+      shared_users = @note_user.shared_notes.where(note_id: @note.id, permissions: "owner")
+      if shared_users.present?
+        shared_users.all.each do |sh_note|
+          sh_note.update(permissions: params[:new_permission])
+        end
+      end
+    elsif (params[:note_permission] == "update" && params[:new_permission] == "read")
+      shared_users = @note_user.shared_notes.where(note_id: @note.id, permissions: "update")
+      if shared_users.present?
+        shared_users.all.each do |sh_note|
+          sh_note.update(permissions: params[:new_permission])
+        end
+      end
     else
-      note_permissions[params[:new_permission]] = [@note.id]
     end
-    @note_user.update(notes_permissions: note_permissions.to_json)
     flash[:notice] = "Note permission has updated for the user: #{@note_user.username}"
     redirect_to user_note_edit_permissions_path(note_id: @note.id)
   end
@@ -94,45 +84,20 @@ class NotesController < ApplicationController
 
   def save_sharing
     @note = Note.find(params[:note_id])
-    users=[]
+    users, non_exist_users=[],[]
     params["user_emails"].split(",").each do |email|
-      notes, permissions =[], {}
       user = User.find_by(username: email.strip)
       if user.present?
-        users.push user.id
-        if user.notes_permissions.present?
-          permissions = JSON.parse user.notes_permissions
-        end
-        if params[:permission] == "read"
-          notes = permissions["read"] if permissions["read"].present?
-          notes.push @note.id
-          permissions["read"] = notes.uniq
-        elsif (params[:permission] == "update")
-          notes = permissions["update"] if permissions["update"].present?
-          notes.push @note.id
-          permissions["update"] = notes.uniq
-        elsif (params[:permission] == "owner")
-          notes = permissions["owner"] if permissions["owner"].present?
-          notes.push @note.id
-          permissions["owner"] = notes.uniq
-        end
-        user.update(notes_permissions: permissions.to_json)
+        @user.shared_notes.create(note_id: @note.id, shared_user_id: user.id, permissions: params[:permission])
+      else
+        non_exist_users.push email
       end
     end
-    sh_note_users, sh_users = [], []
-    if @note.shared_users.present?
-      sh_note_users = (JSON.parse @note.shared_users) + users
+    if non_exist_users.present?
+      flash[:notice] = "Skipped sharing note to non exsting users.. #{non_exist_users}"
     else
-      sh_note_users = users
+      flash[:notice] = "Note has shared for the selected users successfully!"
     end
-    if @user.shared_users.present?
-      sh_users = (JSON.parse @user.shared_users) + users
-    else
-      sh_users = users
-    end
-    @note.update(shared_users: sh_note_users)
-    @user.update(shared_users: sh_users)
-    flash[:notice] = "Note has shared for the selected users successfully!"
     redirect_to user_notes_path(@user.id)
   end
 
@@ -140,44 +105,15 @@ class NotesController < ApplicationController
     @note = Note.find(params[:id])
     if params[:remove_user_note] == "true"
       shared_user = User.find(params[:user_id])
-      if @note.shared_users.present? && @user.shared_users.present?
-        shared_users = (JSON.parse @note.shared_users) + (JSON.parse @user.shared_users)
-        shared_users.uniq.each do |user|
-          update_notes = {}
-          usr = User.find(user)
-          notes = JSON.parse usr.notes_permissions
-          if notes["read"].present? && notes["read"].include?(@note.id)
-            update_notes["read"] = notes["read"] - [@note.id]
-          elsif notes["update"].present? && notes["update"].include?(@note.id)
-            update_notes["update"] = notes["update"] - [@note.id]
-          elsif notes["owner"].present? && notes["owner"].include?(@note.id)
-            update_notes["owner"] = notes["owner"] - [@note.id]
-          else
-          end
-          usr.update(notes_permissions: update_notes.to_json)
-        end
-      end
-
+      SharedNote.where(note_id: @note.id, shared_user_id: shared_user.id).first.delete
+      shared_user.shared_notes.where(note_id: @note.id).delete_all
+      flash[:notice] = "Note has been removed for the user and shared users successfully!"
     else
-      User.all.each do |user|
-        update_notes = {}
-        if user.notes_permissions.present?
-          notes = JSON.parse user.notes_permissions
-          if notes["read"].present? && notes["read"].include?(@note.id)
-            update_notes["read"] = notes["read"] - [@note.id]
-          elsif notes["update"].present? && notes["update"].include?(@note.id)
-            update_notes["update"] = notes["update"] - [@note.id]
-          elsif notes["owner"].present? && notes["owner"].include?(@note.id)
-            update_notes["owner"] = notes["owner"] - [@note.id]
-          else
-          end
-          user.update(notes_permissions: update_notes.to_json)
-        end
-      end
+      SharedNote.where(note_id: @note.id).delete_all
       @note.destroy if @note.present?
       flash[:notice] = "Note deleted successfully!"
-      redirect_to user_notes_path(@user.id)
     end
+    redirect_to user_notes_path(@user.id)
   end
 
   private

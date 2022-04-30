@@ -16,21 +16,21 @@
               <td class="text-danger"><%=User.find(@note.user_id).username%></td>
               <td class="text-danger"><%="owner".capitalize%></td>
               <td>
-                <%= link_to '<i class="fa fa-edit text-warning pr-3 disabled" style= "font-size: 22px;"></i>'.html_safe%>
+                <%= '<i class="fa fa-edit text-warning pr-3 disabled" style= "font-size: 22px;"></i>'.html_safe%>
               </td>
 
             </tr>
-            <% @shared_permissions.each do |user, permission| %>
+            <% @shared_notes.each do |note| %>
 
               <tr>
-                <td class="text-info"><%=User.find(user).username%></td>
-                <td><%=permission.capitalize%></td>
+                <td class="text-info"><%=User.find(note.shared_user_id).username%></td>
+                <td><%=note.permissions.capitalize%></td>
                 <td>
-                  <% if @user.id == user %>
-                    <%= link_to '<i class="fa fa-edit text-warning pr-3 disabled" style= "font-size: 22px;"></i>'.html_safe%>
+                  <% if @user.id == note.shared_user_id %>
+                    <%= '<i class="fa fa-edit text-warning pr-3 disabled" style= "font-size: 22px;"></i>'.html_safe%>
                   <% else %>
-                    <%= link_to '<i class="fa fa-edit text-primary pr-3" style= "font-size: 22px;"></i>'.html_safe, change_permissions_user_notes_path(note_id: @note.id, user_id: user, permission: permission), remote: true, 'data-toggle': 'modal', 'data-target': "#change-permissions-modal"%>
-                    <%= link_to '<i class="fa fa-trash text-danger pr-3" style= "font-size: 22px;"></i>'.html_safe, user_note_path(user, @note.id, remove_user_note: true, permission: permission), method: :delete, data: {confirm: "Are you sure, you want to remove '#{User.find(user).username}' this note?"}, title: 'Remove User from Note', class: "text-danger" %>
+                    <%= link_to '<i class="fa fa-edit text-primary pr-3" style= "font-size: 22px;"></i>'.html_safe, change_permissions_user_notes_path(note_id: @note.id, user_id: note.shared_user_id, permission: note.permissions), remote: true, 'data-toggle': 'modal', 'data-target': "#change-permissions-modal"%>
+                    <%= link_to '<i class="fa fa-trash text-danger pr-3" style= "font-size: 22px;"></i>'.html_safe, user_note_path(note.shared_user_id, @note.id, remove_user_note: true, permission: note.permissions), method: :delete, data: {confirm: "Are you sure, you want to remove '#{User.find(note.shared_user_id).username}' this note?"}, title: 'Remove User from Note', class: "text-danger" %>
                   <% end %>
                 </td>
               </tr>
